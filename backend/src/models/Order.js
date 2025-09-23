@@ -1,0 +1,149 @@
+const mongoose = require("mongoose");
+
+const orderSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    orderId: {
+      type: String,
+      unique: true,
+      required: true
+    },
+    items: [
+      {
+        product: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+          min: 1,
+        },
+        price: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
+    deliveryAddress: {
+      fullName: { type: String, required: true },
+      phone: { type: String, required: true },
+      email: { type: String, required: true },
+      addressLine1: { type: String, required: true },
+      addressLine2: { type: String },
+      city: { type: String, required: true },
+      state: { type: String, required: true },
+      pincode: { type: String, required: true },
+      landmark: { type: String },
+    },
+    pricing: {
+      subtotal: { type: Number, required: true },
+      deliveryFee: { type: Number, required: true },
+      tax: { type: Number, required: true },
+      total: { type: Number, required: true }
+    },
+    paymentMethod: {
+      type: String,
+      enum: ["razorpay", "cod"],
+      required: true
+    },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "completed", "failed", "refunded"],
+      default: "pending",
+    },
+    paymentId: {
+      type: String, // Razorpay Payment ID or COD identifier
+    },
+    status: {
+      type: String,
+      enum: [
+        "placed",
+        "confirmed", 
+        "preparing",
+        "ready_for_pickup",
+        "out_for_delivery",
+        "delivered",
+        "cancelled"
+      ],
+      default: "placed",
+    },
+    deliveryPartner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DeliveryPartner",
+    },
+    deliveryPartnerAssignedAt: {
+      type: Date,
+    },
+    estimatedDeliveryTime: {
+      type: Date,
+    },
+    deliveredAt: {
+      type: Date,
+    },
+    orderNotes: {
+      type: String,
+    },
+    statusHistory: [{
+      status: { type: String, required: true },
+      timestamp: { type: Date, default: Date.now },
+      note: { type: String }
+    }],
+    location: {
+      latitude: { type: Number },
+      longitude: { type: Number },
+      address: { type: String }
+    },
+    helpDeskStatus: {
+      type: String,
+      enum: ["none", "requested", "in_progress", "resolved"],
+      default: "none",
+    },
+    cancelReason: {
+      type: String
+    },
+    rating: {
+      type: Number,
+      min: 1,
+      max: 5
+    },
+    review: {
+      type: String
+    }
+  },
+  { timestamps: true }
+);
+
+// Generate unique order ID
+orderSchema.pre('save', async function(next) {
+  if (!this.orderId) {
+    const count = await mongoose.model('Order').countDocuments();
+    this.orderId = `ORD${Date.now()}${String(count + 1).padStart(4, '0')}`;
+  }
+  
+  // Set estimated delivery time (30-45 minutes from order creation)
+  if (!this.estimatedDeliveryTime) {
+    this.estimatedDeliveryTime = new Date(Date.now() + 35 * 60 * 1000); // 35 minutes
+  }
+  
+  next();
+});
+
+// Add status to history when status changes
+orderSchema.pre('save', function(next) {
+  if (this.isModified('status') && !this.isNew) {
+    this.statusHistory.push({
+      status: this.status,
+      timestamp: new Date(),
+      note: `Order status changed to ${this.status}`
+    });
+  }
+  next();
+});
+
+module.exports = mongoose.model("Order", orderSchema);
