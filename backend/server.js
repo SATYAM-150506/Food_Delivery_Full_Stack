@@ -23,6 +23,8 @@ const allowedOrigins = [
   'http://localhost:3001', 
   'https://localhost:3000',
   'https://localhost:3001',
+  'https://quickbite-peach.vercel.app',
+  'https://food-delivery-full-stack-61ke.vercel.app',
   process.env.FRONTEND_URL
 ].filter(Boolean); // Remove any undefined values
 
