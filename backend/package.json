@@ -22,7 +22,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "build": "node -e \"const fs=require('fs');const path=require('path');const src=path.join(__dirname,'..','frontend','build');const dest=path.join(__dirname,'public'); if(fs.existsSync(src)){ fs.rmSync(dest,{ recursive: true, force: true }); fs.cpSync(src,dest,{ recursive: true }); console.log('Copied frontend build to backend/public'); } else { console.log('No frontend build found at', src); }\"",
+  "build": "npm --prefix ../frontend run build || true && node -e \"const fs=require('fs');const path=require('path');const src=path.join(__dirname,'..','frontend','build');const dest=path.join(__dirname,'public'); if(fs.existsSync(src)){ fs.rmSync(dest,{ recursive: true, force: true }); fs.cpSync(src,dest,{ recursive: true }); console.log('Copied frontend build to backend/public'); } else { console.log('No frontend build found at', src); }\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
