@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../assets/Context/AuthContext';
+import { getFoodImageSrc, handleImageError } from '../assets/utils/imageUtils';
 import { 
   FiPackage, 
   FiClock, 
@@ -257,12 +258,10 @@ const Orders = () => {
                       {order.items.slice(0, 3).map((item, index) => (
                         <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
                           <img
-                            src={item.product?.imageUrl || '/favicon.ico'}
+                            src={getFoodImageSrc(item.product)}
                             alt={item.product?.name}
                             className="w-8 h-8 rounded object-cover"
-                            onError={(e) => {
-                              e.target.src = '/favicon.ico';
-                            }}
+                            onError={(e) => handleImageError(e, item.product)}
                           />
                           <span>{item.product?.name} × {item.quantity}</span>
                         </div>

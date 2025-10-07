@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../../Context/CartContext';
 import { AuthContext } from '../../Context/AuthContext';
 import { useToast } from '../../components/ToastContainer';
+import { getFoodImageSrc, handleImageError } from '../../utils/imageUtils';
 import { FiMinus, FiPlus, FiTrash2, FiShoppingBag, FiArrowRight, FiClock, FiTruck } from 'react-icons/fi';
 
 const Cart = () => {
@@ -231,12 +232,10 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
       {/* Image */}
       <div className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600">
         <img
-          src={item.imageUrl || item.image || item.product?.imageUrl || item.product?.image || '/favicon.ico'}
+          src={getFoodImageSrc(item.product || item)}
           alt={item.name || item.product?.name}
           className="w-full h-full object-cover"
-          onError={(e) => {
-            e.target.src = '/favicon.ico';
-          }}
+          onError={(e) => handleImageError(e, item.product || item)}
         />
       </div>
 

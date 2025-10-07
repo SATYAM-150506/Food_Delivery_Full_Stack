@@ -5,6 +5,7 @@ import productService from '../../services/productService';
 import CategoryFilter from '../../components/CategoryFilter';
 import { SkeletonLoader } from '../../components/Loader';
 import HeroSection from '../../components/HeroSection';
+import { getFoodImageSrc, handleImageError } from '../../utils/imageUtils';
 import { FiPlus, FiStar, FiClock, FiTruck, FiHeart, FiEye, FiShield, FiZap, FiUsers, FiAward } from 'react-icons/fi';
 
 const Home = () => {
@@ -278,10 +279,10 @@ const ProductCard = ({ product, onAddToCart, animationDelay }) => {
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden">
         <img
-          src={imageError ? '/favicon.ico' : product.imageUrl || '/favicon.ico'}
+          src={getFoodImageSrc(product)}
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          onError={() => setImageError(true)}
+          onError={(e) => handleImageError(e, product)}
         />
         
         {/* Overlay Actions */}

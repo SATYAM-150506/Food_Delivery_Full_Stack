@@ -4,6 +4,7 @@ import { CartContext } from '../../Context/CartContext';
 import { AuthContext } from '../../Context/AuthContext';
 import { useDarkMode } from '../../Context/DarkModeContext';
 import { useToast } from '../../components/ToastContainer';
+import { getFoodImageSrc, handleImageError } from '../../utils/imageUtils';
 import { FiArrowLeft, FiMapPin, FiCreditCard, FiCheck, FiTruck, FiShield, FiPhone, FiUser, FiEdit } from 'react-icons/fi';
 import orderService from '../../services/orderService';
 import paymentService from '../../services/paymentService';
@@ -24,6 +25,7 @@ const Checkout = () => {
   const [deliveryAddress, setDeliveryAddress] = useState({
     fullName: user?.name || '',
     phone: user?.phone || '',
+    email: user?.email || '',
     addressLine1: '',
     addressLine2: '',
     city: '',
@@ -33,7 +35,7 @@ const Checkout = () => {
   });
 
   // Payment state
-  const [paymentMethod, setPaymentMethod] = useState('card');
+  const [paymentMethod, setPaymentMethod] = useState('razorpay');
   const [orderNotes, setOrderNotes] = useState('');
 
   // Pricing calculations
@@ -131,7 +133,7 @@ const Checkout = () => {
         deliveryFee,
         tax,
         total,
-        paymentStatus: paymentMethod === 'cod' ? 'pending' : 'pending'
+        paymentStatus: 'pending'
       };
 
       if (paymentMethod === 'cod') {
@@ -151,7 +153,7 @@ const Checkout = () => {
         } else {
           throw new Error(response?.error || 'Failed to place order');
         }
-      } else {
+      } else if (paymentMethod === 'razorpay') {
         // Online Payment - Razorpay Integration
         // Step 1: Create order first with pending payment status
         const pendingOrderData = {
@@ -620,19 +622,19 @@ const Checkout = () => {
                   {/* Online Payment */}
                   <div 
                     className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                      paymentMethod === 'card' 
+                      paymentMethod === 'razorpay' 
                         ? 'border-green-500 bg-green-50 dark:bg-green-900/20' 
                         : isDarkMode ? 'border-gray-700 bg-gray-700/50' : 'border-gray-200 bg-gray-50'
                     }`} 
-                    onClick={() => setPaymentMethod('card')}
+                    onClick={() => setPaymentMethod('razorpay')}
                   >
                     <div className="flex items-center">
                       <input
                         type="radio"
                         name="paymentMethod"
-                        value="card"
-                        checked={paymentMethod === 'card'}
-                        onChange={() => setPaymentMethod('card')}
+                        value="razorpay"
+                        checked={paymentMethod === 'razorpay'}
+                        onChange={() => setPaymentMethod('razorpay')}
                         className="mr-3 text-green-500"
                       />
                       <div className="flex-1">
@@ -849,12 +851,10 @@ const Checkout = () => {
                     <div className="flex items-center flex-1 mr-3">
                       <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg border ${isDarkMode ? 'border-gray-600' : 'border-gray-200'} mr-2 md:mr-3 overflow-hidden flex-shrink-0`}>
                         <img
-                          src={item.product?.imageUrl || item.imageUrl || item.image || '/favicon.ico'}
+                          src={getFoodImageSrc(item.product || item)}
                           alt={item.product?.name || item.name}
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.src = '/favicon.ico';
-                          }}
+                          onError={(e) => handleImageError(e, item.product || item)}
                         />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -905,7 +905,7 @@ const Checkout = () => {
               </div>
 
               {/* Razorpay Branding */}
-              {paymentMethod === 'card' && (
+              {paymentMethod === 'razorpay' && (
                 <div className={`mt-3 p-2 rounded text-center ${isDarkMode ? 'bg-blue-900/20' : 'bg-blue-50'}`}>
                   <p className="text-xs text-blue-600 font-medium">
                     Powered by Razorpay

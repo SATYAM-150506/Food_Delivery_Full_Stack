@@ -1,25 +1,25 @@
 {
-  "short_name": "FoodApp",
-  "name": "Food Delivery App",
+  "short_name": "FoodieExpress",
+  "name": "FoodieExpress - Food Delivery App",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "https://img.icons8.com/color/32/restaurant.png",
       "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "type": "image/png"
     },
     {
-      "src": "logo192.png",
+      "src": "https://img.icons8.com/color/192/restaurant.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "logo512.png",
+      "src": "https://img.icons8.com/color/512/restaurant.png",
       "type": "image/png",
       "sizes": "512x512"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#2563eb",
-  "background_color": "#f9fafb"
+  "theme_color": "#f97316",
+  "background_color": "#fef7f0"
 }

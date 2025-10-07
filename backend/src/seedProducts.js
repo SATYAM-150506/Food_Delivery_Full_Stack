@@ -19,6 +19,18 @@ const sampleProducts = [
     isAvailable: true
   },
   {
+    name: 'Viren',
+    description: 'Juicy Viren',
+    price: 19999,
+    category: 'Burger',
+    imageUrl: 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=500&h=400&fit=crop',
+    rating: 4.3,
+    reviews: 95,
+    deliveryTime: '20-25 min',
+    isVegetarian: false,
+    isAvailable: true
+  },
+  {
     name: 'Pepperoni Pizza',
     description: 'Delicious pizza topped with spicy pepperoni and mozzarella cheese',
     price: 349,

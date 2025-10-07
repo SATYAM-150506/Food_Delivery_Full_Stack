@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { CartContext } from '../../Context/CartContext';
 import { AuthContext } from '../../Context/AuthContext';
 import { useToast } from '../../components/ToastContainer';
+import { getFoodImageSrc, handleImageError } from '../../utils/imageUtils';
 import { FiSearch, FiFilter, FiTruck, FiClock, FiStar, FiHeart, FiPlus, FiMinus, FiX, FiEye } from 'react-icons/fi';
 import axios from 'axios';
 
@@ -412,10 +413,11 @@ const ProductCard = ({ product, onAddToCart, isFavorite, onToggleFavorite, quant
           <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse"></div>
         )}
         <img
-          src={product.imageUrl || 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=500'}
+          src={getFoodImageSrc(product)}
           alt={product.name}
           className={`w-full h-full object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
           onLoad={() => setImageLoaded(true)}
+          onError={(e) => handleImageError(e, product)}
         />
         
         {/* Favorite Button */}
