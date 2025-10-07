@@ -4,7 +4,6 @@ import { CartContext } from '../../Context/CartContext';
 import { AuthContext } from '../../Context/AuthContext';
 import { useDarkMode } from '../../Context/DarkModeContext';
 import { useToast } from '../../components/ToastContainer';
-import { getFoodImageSrc, handleImageError } from '../../utils/imageUtils';
 import { FiArrowLeft, FiMapPin, FiCreditCard, FiCheck, FiTruck, FiShield, FiPhone, FiUser, FiEdit } from 'react-icons/fi';
 import orderService from '../../services/orderService';
 import paymentService from '../../services/paymentService';
@@ -35,7 +34,7 @@ const Checkout = () => {
   });
 
   // Payment state
-  const [paymentMethod, setPaymentMethod] = useState('razorpay');
+  const [paymentMethod, setPaymentMethod] = useState('card');
   const [orderNotes, setOrderNotes] = useState('');
 
   // Pricing calculations
@@ -63,8 +62,13 @@ const Checkout = () => {
   };
 
   const validateAddress = () => {
-    const required = ['fullName', 'phone', 'addressLine1', 'city', 'state', 'pincode'];
+    const required = ['fullName', 'phone', 'email', 'addressLine1', 'city', 'state', 'pincode'];
     return required.every(field => deliveryAddress[field].trim() !== '');
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
   const validatePhoneNumber = (phone) => {
@@ -85,6 +89,11 @@ const Checkout = () => {
 
     if (!validatePhoneNumber(deliveryAddress.phone)) {
       showError('Please enter a valid 10-digit phone number');
+      return;
+    }
+
+    if (!validateEmail(deliveryAddress.email)) {
+      showError('Please enter a valid email address');
       return;
     }
 
@@ -127,13 +136,14 @@ const Checkout = () => {
           price: item.product?.price || item.price || 0
         })),
         deliveryAddress,
-        paymentMethod,
+        // backend expects paymentMethod enum values: 'razorpay' or 'cod'
+        paymentMethod: paymentMethod === 'card' ? 'razorpay' : paymentMethod,
         orderNotes,
         subtotal,
         deliveryFee,
         tax,
         total,
-        paymentStatus: 'pending'
+        paymentStatus: paymentMethod === 'cod' ? 'pending' : 'pending'
       };
 
       if (paymentMethod === 'cod') {
@@ -153,7 +163,7 @@ const Checkout = () => {
         } else {
           throw new Error(response?.error || 'Failed to place order');
         }
-      } else if (paymentMethod === 'razorpay') {
+      } else {
         // Online Payment - Razorpay Integration
         // Step 1: Create order first with pending payment status
         const pendingOrderData = {
@@ -582,6 +592,25 @@ const Checkout = () => {
                   </div>
                 </div>
 
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    Email Address *
+                  </label>
+                  <div className="relative">
+                    <FiShield className={`absolute left-3 top-3.5 w-4 h-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                    <input
+                      type="email"
+                      value={deliveryAddress.email}
+                      onChange={(e) => handleAddressChange('email', e.target.value)}
+                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all ${
+                        isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900'
+                      }`}
+                      placeholder="Enter your email"
+                      required
+                    />
+                  </div>
+                </div>
+
                 <button
                   onClick={handleAddressSubmit}
                   disabled={!validateAddress() || stepLoading}
@@ -622,19 +651,19 @@ const Checkout = () => {
                   {/* Online Payment */}
                   <div 
                     className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
-                      paymentMethod === 'razorpay' 
+                      paymentMethod === 'card' 
                         ? 'border-green-500 bg-green-50 dark:bg-green-900/20' 
                         : isDarkMode ? 'border-gray-700 bg-gray-700/50' : 'border-gray-200 bg-gray-50'
                     }`} 
-                    onClick={() => setPaymentMethod('razorpay')}
+                    onClick={() => setPaymentMethod('card')}
                   >
                     <div className="flex items-center">
                       <input
                         type="radio"
                         name="paymentMethod"
-                        value="razorpay"
-                        checked={paymentMethod === 'razorpay'}
-                        onChange={() => setPaymentMethod('razorpay')}
+                        value="card"
+                        checked={paymentMethod === 'card'}
+                        onChange={() => setPaymentMethod('card')}
                         className="mr-3 text-green-500"
                       />
                       <div className="flex-1">
@@ -851,10 +880,12 @@ const Checkout = () => {
                     <div className="flex items-center flex-1 mr-3">
                       <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg border ${isDarkMode ? 'border-gray-600' : 'border-gray-200'} mr-2 md:mr-3 overflow-hidden flex-shrink-0`}>
                         <img
-                          src={getFoodImageSrc(item.product || item)}
+                          src={item.product?.imageUrl || item.imageUrl || item.image || '/favicon.ico'}
                           alt={item.product?.name || item.name}
                           className="w-full h-full object-cover"
-                          onError={(e) => handleImageError(e, item.product || item)}
+                          onError={(e) => {
+                            e.target.src = '/favicon.ico';
+                          }}
                         />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -905,7 +936,7 @@ const Checkout = () => {
               </div>
 
               {/* Razorpay Branding */}
-              {paymentMethod === 'razorpay' && (
+              {paymentMethod === 'card' && (
                 <div className={`mt-3 p-2 rounded text-center ${isDarkMode ? 'bg-blue-900/20' : 'bg-blue-50'}`}>
                   <p className="text-xs text-blue-600 font-medium">
                     Powered by Razorpay

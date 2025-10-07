@@ -14,8 +14,8 @@ exports.createOrder = async (req, res) => {
     const userId = req.user.id;
     const {
       items,
-      deliveryAddress,
-      paymentMethod,
+      deliveryAddress: rawDeliveryAddress,
+      paymentMethod: rawPaymentMethod,
       paymentId,
       orderNotes,
       subtotal,
@@ -25,12 +25,31 @@ exports.createOrder = async (req, res) => {
       paymentStatus = 'pending'
     } = req.body;
 
+    // Normalize and validate payment method
+    let paymentMethod = rawPaymentMethod;
+    if (paymentMethod === 'card') paymentMethod = 'razorpay';
+
+    // Ensure deliveryAddress has required email field; fall back to user's email
+    const deliveryAddress = Object.assign({}, rawDeliveryAddress);
+    if (!deliveryAddress.email) {
+      // try to fill from user object
+      if (req.user && req.user.email) {
+        deliveryAddress.email = req.user.email;
+      }
+    }
+
     // Validate required fields
     if (!items || !deliveryAddress || !paymentMethod) {
       console.log('Validation failed - missing required fields');
       return res.status(400).json({ 
         error: "Missing required fields: items, deliveryAddress, paymentMethod" 
       });
+    }
+
+    // Validate deliveryAddress.email presence
+    if (!deliveryAddress.email) {
+      console.log('Validation failed - missing deliveryAddress.email');
+      return res.status(400).json({ error: 'deliveryAddress.email is required' });
     }
 
     console.log('Validating items...');
@@ -54,33 +73,18 @@ exports.createOrder = async (req, res) => {
     }
 
     console.log('Creating order with validated items:', validatedItems);
-    
-    // Ensure email is included in delivery address
-    const fullDeliveryAddress = {
-      ...deliveryAddress,
-      email: deliveryAddress.email || req.user.email
-    };
-    
-    // Map frontend payment method to backend enum values
-    let mappedPaymentMethod = paymentMethod;
-    if (paymentMethod === 'card' || paymentMethod === 'razorpay' || paymentMethod === 'online') {
-      mappedPaymentMethod = 'razorpay';
-    } else if (paymentMethod === 'cod' || paymentMethod === 'cash') {
-      mappedPaymentMethod = 'cod';
-    }
-    
     // Create the order
     const order = new Order({
       user: userId,
       items: validatedItems,
-      deliveryAddress: fullDeliveryAddress,
+      deliveryAddress,
       pricing: {
         subtotal: subtotal || validatedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
         deliveryFee: deliveryFee || 40,
         tax: tax || Math.round(subtotal * 0.05),
         total: total || subtotal + deliveryFee + tax
       },
-      paymentMethod: mappedPaymentMethod,
+      paymentMethod,
       paymentId,
       paymentStatus,
       orderNotes,
