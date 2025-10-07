@@ -16,7 +16,29 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: process.env.FRONTEND_URL || '*', credentials: true }));
+
+// CORS configuration to allow multiple origins
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001', 
+  'https://localhost:3000',
+  'https://localhost:3001',
+  process.env.FRONTEND_URL
+].filter(Boolean); // Remove any undefined values
+
+app.use(cors({ 
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true 
+}));
 
 // Routes
 app.use('/api/auth', require('./src/routes/authRoutes'));

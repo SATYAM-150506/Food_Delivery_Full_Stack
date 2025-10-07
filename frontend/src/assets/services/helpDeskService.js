@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:5000/api/helpdesk';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const BASE_URL = `${API_BASE_URL}/api/helpdesk`;
 
 // Create axios instance with common config
 const helpDeskAPI = axios.create({
