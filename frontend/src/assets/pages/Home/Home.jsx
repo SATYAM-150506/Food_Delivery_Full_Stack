@@ -23,13 +23,17 @@ const Home = () => {
       setError('');
       try {
         const data = await productService.getAllProducts();
-        setProducts(data);
+        // Ensure data is an array
+        const productsArray = Array.isArray(data) ? data : [];
+        setProducts(productsArray);
         
         // Extract unique categories from products
-        const uniqueCategories = [...new Set(data.map(product => product.category))];
+        const uniqueCategories = [...new Set(productsArray.map(product => product.category))];
         setCategories(uniqueCategories);
       } catch (error) {
+        console.error('Failed to fetch products:', error);
         setError('Failed to fetch products. Please try again later.');
+        setProducts([]); // Ensure products is always an array
       } finally {
         setLoading(false);
       }
@@ -38,8 +42,8 @@ const Home = () => {
   }, []);
 
   const filteredProducts = selectedCategory === 'All' 
-    ? products 
-    : products.filter(product => product.category === selectedCategory);
+    ? (Array.isArray(products) ? products : [])
+    : (Array.isArray(products) ? products.filter(product => product.category === selectedCategory) : []);
 
   const handleAddToCart = (product) => {
     addToCart(product);
