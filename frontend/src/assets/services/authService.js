@@ -2,6 +2,12 @@ import axios from 'axios';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
+// Debug logging
+console.log('🔧 Auth Service Configuration:');
+console.log('REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+console.log('API_BASE_URL:', API_BASE_URL);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+
 // Create axios instance specifically for auth
 const authAPI = axios.create({
   baseURL: API_BASE_URL,
