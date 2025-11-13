@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "npm ci --prefer-offline --no-audit && cd frontend && npm ci --prefer-offline --no-audit --legacy-peer-deps && npm run build",
+  "buildCommand": "npm ci --prefer-offline --no-audit && cd frontend && rm -rf node_modules .next out && npm ci --prefer-offline --no-audit --legacy-peer-deps && npm run build",
   "builds": [
     {
       "src": "api/index.js",
@@ -27,5 +27,11 @@
   "env": {
     "NODE_ENV": "production"
   },
-  "cleanUrls": true
+  "cleanUrls": true,
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 60
+    }
+  }
 }
+
