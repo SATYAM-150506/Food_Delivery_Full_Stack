@@ -3,8 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "build": "cd frontend && npm ci --legacy-peer-deps && npm run build",
-    "vercel-build": "cd frontend && npm ci --legacy-peer-deps && npm run build"
+    "build": "bash build-prod.sh",
+    "vercel-build": "bash build-prod.sh"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
