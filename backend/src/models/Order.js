@@ -60,6 +60,12 @@ const orderSchema = new mongoose.Schema(
     paymentId: {
       type: String, // Razorpay Payment ID or COD identifier
     },
+    razorpayOrderId: {
+      type: String, // Razorpay Order ID for verification
+    },
+    razorpaySignature: {
+      type: String, // Razorpay Signature for verification
+    },
     status: {
       type: String,
       enum: [

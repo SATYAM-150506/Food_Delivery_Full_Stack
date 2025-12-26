@@ -1,19 +1,19 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Home from '../assets/pages/Home/Home';
-import Products from '../assets/pages/Products/Products';
-import Cart from '../assets/pages/Cart/Cart';
-import Checkout from '../assets/pages/Payment/Checkout';
-import OrderHistory from '../assets/pages/Orders/OrderHistory';
-import OrderConfirmation from '../assets/pages/Orders/OrderConfirmation';
-import OrderTracking from '../assets/pages/Orders/OrderTracking';
-import PaymentGateway from '../assets/pages/Payment/PaymentGateway';
-import Profile from '../assets/pages/Profile/Profile';
-import HelpDesk from '../assets/pages/HelpDesk/HelpDesk';
-import Login from '../assets/pages/Auth/Login';
-import Signup from '../assets/pages/Auth/Signup';
-import Dashboard from '../assets/pages/Admin/Dashboard';
-import ProtectedRoute from '../assets/components/ProtectedRoute';
+import Home from '../assets/pages/Home/Home.jsx';
+import Products from '../assets/pages/Products/Products.jsx';
+import Cart from '../assets/pages/Cart/Cart.jsx';
+import Checkout from '../assets/pages/Payment/Checkout.jsx';
+import OrderHistory from '../assets/pages/Orders/OrderHistory.jsx';
+import OrderConfirmation from '../assets/pages/Orders/OrderConfirmation.jsx';
+import OrderTracking from '../assets/pages/Orders/OrderTracking.jsx';
+import PaymentGateway from '../assets/pages/Payment/PaymentGateway.jsx';
+import Profile from '../assets/pages/Profile/Profile.jsx';
+import HelpDesk from '../assets/pages/HelpDesk/HelpDesk.jsx';
+import Login from '../assets/pages/Auth/Login.jsx';
+import Signup from '../assets/pages/Auth/Signup.jsx';
+import Dashboard from '../assets/pages/Admin/Dashboard.jsx';
+import ProtectedRoute from '../assets/components/ProtectedRoute.jsx';
 
 // Error boundary component for better error handling
 const ErrorBoundary = ({ children, fallback }) => {
